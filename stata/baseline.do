@@ -95,10 +95,9 @@ export excel using ".\result\baseline\baseline_GVC.xlsx", firstrow(var) replace
 ********************************************************************************
 *			CounterFactual of Intermeidate and Final Use
 ********************************************************************************
-foreach v in "IntermediateTradeAndTariffchange" "FinalTradeAndTariffchange" ///
-"onlyIntermediateTradeCostchange" "onlyIntermediateTariffchange" ///
+foreach v in "IntermediateTradeAndTariffchange" "FinalTradeAndTariffchange" ///"onlyIntermediateTradeCostchange" "onlyIntermediateTariffchange" ///
 "onlyTariffchange" "onlyTradeCostchange" ///
-"onlyFinalTradeCostchange" "onlyFinalTariffchange" "diff"{
+"diff"{
 	import excel using ".\result\baseline\RealWage_rcep_`v'.xlsx", clear
 	rename A realwage
 	gen countryid = _n
@@ -143,18 +142,20 @@ replace CF = "只有最终产品的贸易成本与关税变化" if CF == ""
 
 append using onlyTradeCostchange_CHN.dta
 replace CF = "只有贸易成本变化" if CF == ""
+/*
 append using onlyIntermediateTradeCostchange_CHN.dta
 replace CF = "只有中间产品的贸易成本变化" if CF == ""
 append using onlyFinalTradeCostchange_CHN.dta
 replace CF = "只有最终产品的贸易成本变化" if CF == ""
-
+*/
 append using onlyTariffchange_CHN.dta
 replace CF = "只有关税变化" if CF == ""
+/*
 append using onlyIntermediateTariffchange_CHN.dta
 replace CF = "只有中间产品的关税变化" if CF == ""
 append using onlyFinalTariffchange_CHN.dta
 replace CF = "只有最终产品的关税变化" if CF == ""
-
+*/
 order CF
 tostring E* *age*, format(%9.2f) replace force
 
@@ -169,18 +170,20 @@ replace CF = "只有最终产品的贸易成本与关税变化" if CF == ""
 
 append using onlyTradeCostchange.dta
 replace CF = "只有贸易成本变化" if CF == ""
+/*
 append using onlyIntermediateTradeCostchange.dta
 replace CF = "只有中间产品的贸易成本变化" if CF == ""
 append using onlyFinalTradeCostchange.dta
 replace CF = "只有最终产品的贸易成本变化" if CF == ""
-
+*/
 append using onlyTariffchange.dta
 replace CF = "只有关税变化" if CF == ""
+/*
 append using onlyIntermediateTariffchange.dta
 replace CF = "只有中间产品的关税变化" if CF == ""
 append using onlyFinalTariffchange.dta
 replace CF = "只有最终产品的关税变化" if CF == ""
-
+*/
 order CF
 merge m:1 countryid using ".\data\countryname2018.dta", keepusing(name) nogenerate
 
@@ -188,9 +191,8 @@ export excel using ".\table\RCEP通过不同用途不同贸易成本变化带来
 
 
 foreach v in "IntermediateTradeAndTariffchange" "FinalTradeAndTariffchange" ///
-"onlyIntermediateTradeCostchange" "onlyIntermediateTariffchange" ///
 "onlyTariffchange" "onlyTradeCostchange" ///
-"onlyFinalTradeCostchange" "onlyFinalTariffchange" "diff"{
+"diff"{
 	erase `v'_CHN.dta
 	erase `v'.dta
 }
