@@ -101,3 +101,5 @@ twoway scatter positionp position if RCEP == 1, msym(c) mlab(shortname) mlabvpos
 	   scheme(s1color)
 graph export ".\figure\GVC地位RCEP冲击的变化(中间与最终贸易成本变化不同).png", width(1342) height(976) replace
 restore
+
+erase oecd_gvc.dta
