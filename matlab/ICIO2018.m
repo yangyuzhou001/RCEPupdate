@@ -36,9 +36,13 @@ for t = 2005:1:2015
     eval(['X',num2str(t),' = X;']);
 
     Yijs = reshape(Yijs3D,N*N*J,1);                                             %[exporter*importer*supplier]
+    Zijs = reshape(Zijs3D,N*N*J,1);
+    Fijs = reshape(sum(Fijsk4D(:,:,:,1:4),4) + sum(Fijsk4D(:,:,:,6),4),N*N*J,1);
     
     filename = ['../data/ICIO2018_',num2str(t),'.xlsx'];
     xlswrite(filename,Yijs);
+    filename2 = ['../data/ICIO2018_',num2str(t),'ZF.xlsx'];
+    xlswrite(filename2,[Zijs,Fijs]);
     
     if t == 2005
         eval(['save ../data/X.mat X',num2str(t),';']);
