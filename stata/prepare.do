@@ -177,7 +177,61 @@ drop if _merge == 2
 drop _merge
 */
 save ".\data\total_ZF.dta", replace
+******************************************************************************
+*                           ICIO2018 JIE2019                                 *
+******************************************************************************
 
+**icio
+forvalues i = 2005/2015{
+	import excel using ".\data\ICIO2018_`i'ZF.xlsx", clear
+	rename (A B) (Z F)
+	gen sectorid = ceil(_n/(65*65))
+	by sectorid, sort : gen impid = ceil(_n/65)
+	by sectorid impid, sort : gen expid = _n
+	save ".\data\ICIO2018_`i'ZF.dta", replace
+}
+
+use ".\data\ICIO2018_2005ZF.dta", clear
+gen year = 2005
+forvalues i = 2006/2015{
+	append using ".\data\ICIO2018_`i'ZF.dta"
+	replace year = `i' if year == .	
+	erase ".\data\ICIO2018_`i'ZF.dta"
+}
+cap erase ".\data\ICIO2018_2005ZF.dta"
+rename impid countryid
+merge m:1 countryid using ".\data\countryname2018.dta", nogenerate
+rename (countryid shortname ICIOcountry) (impid imp impName)
+rename expid countryid
+merge m:1 countryid using ".\data\countryname2018.dta", nogenerate
+rename (countryid shortname ICIOcountry) (expid exp expName)
+** tariff
+rename (impName expName year) (ReporterName PartnerName TariffYear)
+merge 1:1 ReporterName PartnerName TariffYear sectorid using ".\data\tauFinal.dta", keep(match master) nogenerate
+replace t1 = 1 if t1 == .
+replace t2 = 1 if t2 == .
+rename (ReporterName PartnerName TariffYear) (impName expName year)
+** CEPII
+rename impName country
+merge m:1 country using ".\data\cepii_countryname.dta", keep(match master) nogenerate
+rename (country iso3) (impName iso_d)
+rename expName country
+merge m:1 country using ".\data\cepii_countryname.dta", keep(match master) nogenerate
+rename (country iso3) (expName iso_o)
+merge m:1 iso_o iso_d using ".\originaldata\dist_cepii.dta", keepusing(contig comlang_off colony dist) keep(match master) nogenerate
+** RTA 
+rename (exp imp) (exporter importer)
+merge m:1 exporter importer year using ".\originaldata\rta_20181107\rta_20181107.dta", keepusing(rta) keep(match master) nogenerate
+/*by year, sort : egen rtasum = mean(rta)
+replace rta = rtasum if rta == .						//ROW's RTA = 0
+drop if _merge == 2
+drop _merge
+*/
+save ".\data\total_ZF2018.dta", replace
+
+******************************************************************************
+*							basic data for regression
+******************************************************************************
 use ".\data\total_ZF.dta", clear
 drop if sector == 18
 replace t1 = 1
